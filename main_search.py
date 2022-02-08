@@ -6,6 +6,7 @@ import argparse
 def main():
     parser = argparse.ArgumentParser(description="Query current CSU Chico course schedule")
 
+    # Allow user to use Single class functions or multiclass functions
     subparsers = parser.add_subparsers(title="Valid Subcommands", help="Type of query, S = Single, M = Multi", dest="command", required=True)
     
     solo_parser = subparsers.add_parser("S")
@@ -19,6 +20,7 @@ def main():
     
     args = parser.parse_args()
 
+    # Figure out which command they're using
     if args.command == "S":
         subject, catalog_nbr = args.name[0].split('-')
     elif args.command == "M":
@@ -28,16 +30,18 @@ def main():
         print("Something went wrong")
         return
 
+
+    # CSU Chico class schedule search
     URL = "https://cmsweb.csuchico.edu/psc/CCHIPRD/EMPLOYEE/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?"
 
     PARAMS = {
         'institution':'CHICO',
-        'term':'2202',
+        'term':'2202', # Term is a numerical representation of Spring/Summer/Fall/Winter term
         'date_from':'',
         'date_thru':'',
-        'subject':subject,
+        'subject':subject, # 4 letter abbreviation, i.e. KINE = Kinesiology
         'subject_like':'',
-        'catalog_nbr':catalog_nbr,
+        'catalog_nbr':catalog_nbr, # Class number from catalog
         'time_range':'',
         'days':'',
         'campus':'',
