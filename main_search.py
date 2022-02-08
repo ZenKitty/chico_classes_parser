@@ -1,4 +1,4 @@
-import json
+import sys
 import textwrap
 import requests
 import argparse
@@ -76,8 +76,9 @@ def main():
         print("Multi-Class implementation still in progress")
         return
     else:
-        print("Something went wrong")
+        print("Something went wrong", file=sys.stderr)
         return
+    return
 
 
 
