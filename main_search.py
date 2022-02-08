@@ -21,7 +21,7 @@ def single_class(subject, catalog_nbr, URL, include_labs):
             print("No classes found with that Subject and Catalog Number")
         for class_found in class_dict:
             if class_found['component'] != "ACT" or include_labs:
-                print("Section {}:".format(class_found['class_section']))
+                print(f"{class_found['component']} Section {class_found['class_section']}:")
                 for time in class_found['meetings']:
                     start_hour, start_minute, start_second, excess = time['start_time'].split('.')
                     start_hour_int = int(start_hour) if int(start_hour) <= 12 else int(start_hour) % 12
