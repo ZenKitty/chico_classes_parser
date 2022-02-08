@@ -3,7 +3,7 @@ import textwrap
 import requests
 import argparse
 
-def single_class(subject, catalog_nbr, URL):
+def single_class(subject, catalog_nbr, URL, include_labs):
     PARAMS = {
         'institution':'CHICO',
         'term':'2202', # Term is a numerical representation of Spring/Summer/Fall/Winter term
@@ -20,7 +20,7 @@ def single_class(subject, catalog_nbr, URL):
         if not bool(class_dict):
             print("No classes found with that Subject and Catalog Number")
         for class_found in class_dict:
-            if class_found['component'] != "ACT" or args.lab:
+            if class_found['component'] != "ACT" or include_labs:
                 print("Section {}:".format(class_found['class_section']))
                 for time in class_found['meetings']:
                     start_hour, start_minute, start_second, excess = time['start_time'].split('.')
@@ -71,7 +71,7 @@ def main():
     # Figure out which command they're using
     if args.command == "S":
         subject, catalog_nbr = args.name[0].split('-')
-        single_class(subject, catalog_nbr, URL)
+        single_class(subject, catalog_nbr, URL, args.lab)
     elif args.command == "M":
         print("Multi-Class implementation still in progress")
         return
