@@ -80,8 +80,8 @@ def multi_class(subjects, URL, best, term='2222'):
                                 times[day][end_hour_int] += 1
                         except:
                             pass
-            else:
-                print(class_list.status_code)
+        else:
+            print(class_list.status_code)
     for i, day in enumerate(WEEKDAYS):
         desired_time = 0
         if best:
