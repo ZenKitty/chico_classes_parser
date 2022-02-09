@@ -22,7 +22,7 @@ def single_class(subject, catalog_nbr, URL, include_labs):
         if not bool(class_dict):
             print("No classes found with that Subject and Catalog Number")
         for class_found in class_dict:
-            if class_found['component'] == "LEC" or (class_found['component'] == "ACT" and include_labs):
+            if class_found['component'] == "DIS" or class_found['component'] == "LEC" or (class_found['component'] == "ACT" and include_labs):
                 print(f"{class_found['component']} Section {class_found['class_section']}:")
                 for time in class_found['meetings']:
                     start_hour, start_minute, start_second, excess = time['start_time'].split('.')
