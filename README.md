@@ -2,6 +2,7 @@
 
 A command line class parser for CSU Chico by Duncan Hendrickson
 
+Currently runs on Python 3.9.7
 
 ## Usage
 
