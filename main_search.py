@@ -60,23 +60,27 @@ def multi_class(subjects, URL, best):
             'term':'2202', # Term is a numerical representation of Spring/Summer/Fall/Winter term
             'subject':subject, # 4 letter abbreviation, i.e. KINE = Kinesiology
         }
-        class_dict = requests.get(url=URL, params=PARAMS).json()
-        if not bool(class_dict):
-            print(f"Could not find abbreviation {subject}, skipping")
-        for class_found in class_dict:
-            for time in class_found['meetings']:
-                start_hour = time['start_time'].split('.')[0]
-                end_hour = time['end_time'].split('.')[0]
-                days = re.findall(r'[A-Z][a-z]', time['days']) # Date format is always 'MoWeFr' format
-                for day in days:
-                    try:
-                        start_hour_int = int(start_hour)
-                        end_hour_int = int(end_hour)
-                        times[day][start_hour_int] += 1
-                        if start_hour_int != end_hour_int:
-                            times[day][end_hour_int] += 1
-                    except:
-                        pass
+        class_list = requests.get(url=URL, params=PARAMS)
+        if class_list.status_code == 200:
+            class_dict = class_list.json()
+            if not bool(class_dict):
+                print(f"Could not find abbreviation {subject}, skipping")
+            for class_found in class_dict:
+                for time in class_found['meetings']:
+                    start_hour = time['start_time'].split('.')[0]
+                    end_hour = time['end_time'].split('.')[0]
+                    days = re.findall(r'[A-Z][a-z]', time['days']) # Date format is always 'MoWeFr' format
+                    for day in days:
+                        try:
+                            start_hour_int = int(start_hour)
+                            end_hour_int = int(end_hour)
+                            times[day][start_hour_int] += 1
+                            if start_hour_int != end_hour_int:
+                                times[day][end_hour_int] += 1
+                        except:
+                            pass
+            else:
+                print(class_list.status_code)
     for i, day in enumerate(WEEKDAYS):
         desired_time = 0
         if best:
