@@ -132,7 +132,7 @@ def main():
         if not bool(args.best) and not bool(args.worst):
             print("M command requires one of the two subcommands, -b or -w")
         else:
-            multi_class((args.best if bool(args.best) else args.worst), URL, (not bool(args.best)))
+            multi_class((args.best if bool(args.best) else args.worst), URL, bool(args.best))
     elif args.command == "T":
         print("Time command implementation in progress")
         return
