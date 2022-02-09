@@ -40,6 +40,48 @@ def single_class(subject, catalog_nbr, URL, include_labs):
         print(class_list.status_code)
         
 
+def multi_class(subjects, URL, best):
+    times = {
+        8: 0,
+        9: 0,
+        10: 0,
+        11: 0,
+        12: 0,
+        13: 0,
+        14: 0,
+        15: 0,
+        16: 0,
+        17: 0,
+    }
+    for subject in subjects:
+        print(f"Processing {subject}...")
+        PARAMS = {
+            'institution':'CHICO',
+            'term':'2202', # Term is a numerical representation of Spring/Summer/Fall/Winter term
+            'subject':subject, # 4 letter abbreviation, i.e. KINE = Kinesiology
+        }
+        class_list = requests.get(url=URL, params=PARAMS)
+        class_dict = class_list.json()
+        for class_found in class_dict:
+            for time in class_found['meetings']:
+                hour = time['start_time'].split('.')[0]
+                try:
+                    hour_int = int(hour)
+                    times[hour_int] += 1
+                except:
+                    pass
+    desired_time = 0
+    if best:
+        desired_time = min(times, key=times.get)
+    else:
+        desired_time = max(times, key=times.get)
+    time_txt =" AM" if desired_time < 12 else " PM"
+    desired_time = desired_time % 12 if desired_time > 12 else desired_time
+    phrase = "Best" if best else "Worst"
+    print(f"{phrase} time for an hour long event: {desired_time}{time_txt}")
+    return
+
+
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent('''\
         Query current CSU Chico course schedule
@@ -55,13 +97,14 @@ def main():
     solo_parser = subparsers.add_parser("S")
     solo_parser.add_argument("name", nargs=1, type=str, help="Input class name and number. Format: CSCI-211")
     solo_parser.add_argument("-l", "--lab", help="Include lab sections", action="store_true")
-    solo_parser.add_help
     
     multi_parser = subparsers.add_parser("M")
     group2 = multi_parser.add_mutually_exclusive_group()
     group2.add_argument("-b", "--best", help="Find the best time for an event, given a list of Subject Abbreviations", nargs="+", metavar="SUBJECT")
     group2.add_argument("-w", "--worst", help="Find the best time for an event, given a list of Subject Abbreviations", nargs="+", metavar="SUBJECT")
-    group2.add_argument("-time" "--time", help="Find how many classes start at a specific time. Format: 10:00 AM, or 2:00 PM", nargs=1, type=str, metavar="TIME")
+
+    time_parse = subparsers.add_parser("T")
+    time_parse.add_argument("time", help="Find how many classes start at a specific time. Format: 10:00 AM, or 2:00 PM", nargs=1, type=str, metavar="TIME")
     
     args = parser.parse_args()
 
@@ -73,7 +116,12 @@ def main():
         subject, catalog_nbr = args.name[0].split('-')
         single_class(subject, catalog_nbr, URL, args.lab)
     elif args.command == "M":
-        print("Multi-Class implementation still in progress")
+        if not bool(args.best) and not bool(args.worst):
+            print("M command requires one of the two subcommands, -b or -w")
+        else:
+            multi_class((args.best if bool(args.best) else args.worst), URL, (True if bool(args.best) else False))
+    elif args.command == "T":
+        print("Time command implementation in progress")
         return
     else:
         print("Something went wrong", file=sys.stderr)
