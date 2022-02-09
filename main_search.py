@@ -4,11 +4,12 @@ import textwrap
 import requests
 import argparse
 import re
+from datetime import date
 
-def single_class(subject, catalog_nbr, URL, include_labs):
+def single_class(subject, catalog_nbr, URL, include_lab, term='2222'):
     PARAMS = {
         'institution':'CHICO',
-        'term':'2202', # Term is a numerical representation of Spring/Summer/Fall/Winter term
+        'term':term, # Term is a numerical representation of Spring/Summer/Fall/Winter term
         'subject':subject, # 4 letter abbreviation, i.e. KINE = Kinesiology
         'catalog_nbr':catalog_nbr, # Class number from catalog
     }
@@ -22,7 +23,7 @@ def single_class(subject, catalog_nbr, URL, include_labs):
         if not bool(class_dict):
             print("No classes found with that Subject and Catalog Number")
         for class_found in class_dict:
-            if class_found['component'] == "DIS" or class_found['component'] == "LEC" or (class_found['component'] == "ACT" and include_labs):
+            if class_found['component'] == "DIS" or class_found['component'] == "LEC" or (class_found['component'] == "ACT" and include_lab):
                 print(f"{class_found['component']} Section {class_found['class_section']}:")
                 for time in class_found['meetings']:
                     start_hour, start_minute, start_second, excess = time['start_time'].split('.')
@@ -43,7 +44,7 @@ def single_class(subject, catalog_nbr, URL, include_labs):
         print(class_list.status_code)
         
 
-def multi_class(subjects, URL, best):
+def multi_class(subjects, URL, best, term='2222'):
     subjects = set(subjects) # removes duplicates
     WEEKDAYS = {0: "Mo", 1: "Tu", 2: "We", 3: "Th", 4: "Fr"}
     times = {
@@ -57,7 +58,7 @@ def multi_class(subjects, URL, best):
         print(f"Processing {subject}...")
         PARAMS = {
             'institution':'CHICO',
-            'term':'2202', # Term is a numerical representation of Spring/Summer/Fall/Winter term
+            'term':term, # Term is a numerical representation of Spring/Summer/Fall/Winter term
             'subject':subject, # 4 letter abbreviation, i.e. KINE = Kinesiology
         }
         class_list = requests.get(url=URL, params=PARAMS)
@@ -94,6 +95,23 @@ def multi_class(subjects, URL, best):
 
     return
 
+# Gets the numerical value for the given term requested, relative to current semester
+def get_term(mod) -> str:
+    today_term = date.today()
+    add_sem = 0
+    if mod % 2 == 1:
+        mod -= 1
+        if today_term.month < 6:
+            add_sem = 6
+        else:
+            add_sem = 4
+    add_year = int(mod/2)
+    if mod > 0:
+        term = ((today_term.year + add_year) % 2022)*10 + 2222 + add_sem
+    else:
+        term = 2222 - ((today_term.year - add_year) % 2022)*10 + add_sem
+    return str(term)
+
 
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent('''\
@@ -105,7 +123,7 @@ def main():
     
 
     # Allow user to use Single class functions or multiclass functions
-    subparsers = parser.add_subparsers(title="Valid Subcommands", help="Type of query, S = Single, M = Multi", dest="command", required=True)
+    subparsers = parser.add_subparsers(title="Valid Subcommands", help="Type of query, S = Single, M = Multi, T not yet implemented", dest="command", required=True)
     
     solo_parser = subparsers.add_parser("S")
     solo_parser.add_argument("name", nargs=1, type=str, help="Input class name and number. Format: CSCI-211")
@@ -119,16 +137,24 @@ def main():
     time_parse = subparsers.add_parser("T")
     time_parse.add_argument("time", help="Find how many classes start at a specific time. Format: 10:00 AM, or 2:00 PM", nargs=1, type=str, metavar="TIME")
     
+    parser.add_argument("-t", "--term", help="Specify a term relative to current term. Each semester is worth 1. Only fall and spring available currently. Format: '1', '+2', or '-4', etc. ", nargs=1, type=str, default='0')
     args = parser.parse_args()
 
     # CSU Chico class schedule search
     URL = "https://cmsweb.csuchico.edu/psc/CCHIPRD/EMPLOYEE/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?"
 
+    term = ''
+    try:
+        mod_term = int(args.term[0])
+        term = get_term(mod_term)
+    except:
+        print("Failed to read term argument, please try again.")
+        return
     # Figure out which command they're using
     if args.command == "S":
         try:
             subject, catalog_nbr = args.name[0].split('-')
-            single_class(subject, catalog_nbr, URL, args.lab)
+            single_class(subject, catalog_nbr, URL, args.lab, term)
         except ValueError:
             print(f"Failed to parse {args.name[0]}, failing...")
             return
@@ -136,7 +162,7 @@ def main():
         if not bool(args.best) and not bool(args.worst):
             print("M command requires one of the two subcommands, -b or -w")
         else:
-            multi_class((args.best if bool(args.best) else args.worst), URL, bool(args.best))
+            multi_class((args.best if bool(args.best) else args.worst), URL, bool(args.best), term)
     elif args.command == "T":
         print("Time command implementation in progress")
         return

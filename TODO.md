@@ -1,6 +1,6 @@
 # Todo on current program
 
-- Determine term number pattern to work for future/past terms
+- Add requirements.txt and Python version
 - Add Time command
     - Find how many classes happen at a given time given a list of subjects
 - Add verbose option for Single Class Search to list teachers, etc. 
