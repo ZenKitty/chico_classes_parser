@@ -122,8 +122,12 @@ def main():
 
     # Figure out which command they're using
     if args.command == "S":
-        subject, catalog_nbr = args.name[0].split('-')
-        single_class(subject, catalog_nbr, URL, args.lab)
+        try:
+            subject, catalog_nbr = args.name[0].split('-')
+            single_class(subject, catalog_nbr, URL, args.lab)
+        except ValueError:
+            print(f"Failed to parse {args.name[0]}, failing...")
+            return
     elif args.command == "M":
         if not bool(args.best) and not bool(args.worst):
             print("M command requires one of the two subcommands, -b or -w")
