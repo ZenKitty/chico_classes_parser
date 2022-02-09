@@ -22,7 +22,7 @@ def single_class(subject, catalog_nbr, URL, include_labs):
         if not bool(class_dict):
             print("No classes found with that Subject and Catalog Number")
         for class_found in class_dict:
-            if class_found['component'] != "ACT" or include_labs:
+            if class_found['component'] == "LEC" or (class_found['component'] == "ACT" and include_labs):
                 print(f"{class_found['component']} Section {class_found['class_section']}:")
                 for time in class_found['meetings']:
                     start_hour, start_minute, start_second, excess = time['start_time'].split('.')
@@ -44,7 +44,7 @@ def single_class(subject, catalog_nbr, URL, include_labs):
         
 
 def multi_class(subjects, URL, best):
-    subjects = set(subjects)
+    subjects = set(subjects) # removes duplicates
     WEEKDAYS = {0: "Mo", 1: "Tu", 2: "We", 3: "Th", 4: "Fr"}
     times = {
         "Mo":{8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17:0},
@@ -60,15 +60,14 @@ def multi_class(subjects, URL, best):
             'term':'2202', # Term is a numerical representation of Spring/Summer/Fall/Winter term
             'subject':subject, # 4 letter abbreviation, i.e. KINE = Kinesiology
         }
-        class_list = requests.get(url=URL, params=PARAMS)
-        class_dict = class_list.json()
+        class_dict = requests.get(url=URL, params=PARAMS).json()
         if not bool(class_dict):
             print(f"Could not find abbreviation {subject}, skipping")
         for class_found in class_dict:
             for time in class_found['meetings']:
                 start_hour = time['start_time'].split('.')[0]
                 end_hour = time['end_time'].split('.')[0]
-                days = re.findall(r'[A-Z][a-z]', time['days'])
+                days = re.findall(r'[A-Z][a-z]', time['days']) # Date format is always 'MoWeFr' format
                 for day in days:
                     try:
                         start_hour_int = int(start_hour)
