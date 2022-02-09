@@ -2,6 +2,7 @@ import sys
 import textwrap
 import requests
 import argparse
+import re
 
 def single_class(subject, catalog_nbr, URL, include_labs):
     PARAMS = {
@@ -42,18 +43,15 @@ def single_class(subject, catalog_nbr, URL, include_labs):
         
 
 def multi_class(subjects, URL, best):
+    subjects = set(subjects)
+    WEEKDAYS = {0: "Mo", 1: "Tu", 2: "We", 3: "Th", 4: "Fr"}
     times = {
-        8: 0,
-        9: 0,
-        10: 0,
-        11: 0,
-        12: 0,
-        13: 0,
-        14: 0,
-        15: 0,
-        16: 0,
-        17: 0,
-    }
+        "Mo":{8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17:0},
+        "Tu":{8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17:0},
+        "We":{8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17:0},
+        "Th":{8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17:0},
+        "Fr":{8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17:0},
+        }
     for subject in subjects:
         print(f"Processing {subject}...")
         PARAMS = {
@@ -63,23 +61,33 @@ def multi_class(subjects, URL, best):
         }
         class_list = requests.get(url=URL, params=PARAMS)
         class_dict = class_list.json()
+        if not bool(class_dict):
+            print(f"Could not find abbreviation {subject}, skipping")
         for class_found in class_dict:
             for time in class_found['meetings']:
-                hour = time['start_time'].split('.')[0]
-                try:
-                    hour_int = int(hour)
-                    times[hour_int] += 1
-                except:
-                    pass
-    desired_time = 0
-    if best:
-        desired_time = min(times, key=times.get)
-    else:
-        desired_time = max(times, key=times.get)
-    time_txt =" AM" if desired_time < 12 else " PM"
-    desired_time = desired_time % 12 if desired_time > 12 else desired_time
-    phrase = "Best" if best else "Worst"
-    print(f"{phrase} time for an hour long event: {desired_time}{time_txt}")
+                start_hour = time['start_time'].split('.')[0]
+                end_hour = time['end_time'].split('.')[0]
+                days = re.findall(r'[A-Z][a-z]', time['days'])
+                for day in days:
+                    try:
+                        start_hour_int = int(start_hour)
+                        end_hour_int = int(end_hour)
+                        times[day][start_hour_int] += 1
+                        if start_hour_int != end_hour_int:
+                            times[day][end_hour_int] += 1
+                    except:
+                        pass
+    for i, day in enumerate(WEEKDAYS):
+        desired_time = 0
+        if best:
+            desired_time = min(times[WEEKDAYS[i]], key=times[WEEKDAYS[i]].get)
+        else:
+            desired_time = max(times[WEEKDAYS[i]], key=times[WEEKDAYS[i]].get)
+        time_txt =" AM" if desired_time < 12 else " PM"
+        desired_time = desired_time % 12 if desired_time > 12 else desired_time
+        phrase = "Best" if best else "Worst"
+        print(f"{phrase} time for an hour long event on {WEEKDAYS[i]}: {desired_time}{time_txt}")
+
     return
 
 
