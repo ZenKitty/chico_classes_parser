@@ -5,6 +5,12 @@ A command line class parser for CSU Chico by Duncan Hendrickson
 
 ## Usage
 
+- Global Option:
+    - ```-t``` Specify what semester/term you want to use for a given command
+        - 0 by default, gets current semester's term
+        - Format: ```./main_search.py -t -1 S CSCI-111```
+            - Will result in previous semester's results
+
 - Single Class Search:
     - ```./main_search.py S CSCI-211```
     - By default excludes lab sections, use -l to enable labs
