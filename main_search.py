@@ -106,10 +106,8 @@ def get_term(mod) -> str:
         else:
             add_sem = 4
     add_year = int(mod/2)
-    if mod > 0:
-        term = ((today_term.year + add_year) % 2022)*10 + 2222 + add_sem
-    else:
-        term = 2222 - ((today_term.year - add_year) % 2022)*10 + add_sem
+    coeff = 1 if mod > 0 else -1
+    term = ((today_term.year + add_year*coeff) % 2022)*10*coeff + 2222 + add_sem
     return str(term)
 
 
