@@ -34,6 +34,7 @@ def single_class(subject, catalog_nbr, URL, include_labs):
                     end_hour, end_minute, end_second, excess = time['end_time'].split('.')
                     end_string = f"\t{end_hour_int}:{end_minute} {end_M}"
                     
+                    print(f"\t{time['days']}")
                     print(start_string)
                     print(end_string)
     else:
