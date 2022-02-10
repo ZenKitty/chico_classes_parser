@@ -75,9 +75,8 @@ def multi_class(subjects, URL, best, term='2222') -> None:
                         try:
                             start_hour_int = int(start_hour)
                             end_hour_int = int(end_hour)
-                            times[day][start_hour_int] += 1
-                            if start_hour_int != end_hour_int:
-                                times[day][end_hour_int] += 1
+                            for i in range(start_hour_int, end_hour_int + 1):
+                                times[day][i] += 1
                         except:
                             pass
         else:
