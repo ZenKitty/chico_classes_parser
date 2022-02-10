@@ -40,8 +40,10 @@ def single_class(subject, catalog_nbr, URL, include_lab, term='2222') -> None:
                     print(f"\t{time['days']}")
                     print(start_string)
                     print(end_string)
+        return
     else:
-        print(class_list.status_code)
+        print(f"Search failed with a code of: {class_list.status_code}")
+        return
         
 
 def multi_class(subjects, URL, best, term='2222') -> None:
