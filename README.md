@@ -16,7 +16,9 @@ Currently runs on Python 3.9.7
     - Use -w tp find the worst meeting times
 
 - Time Function
-    - Not created yet
+    - ```./main_search T CSCI 9:00```
+    - Shows class sections that start at given time
+    - Accepts whole or half hours in format H:MM
 
 - Global Option:
     - ```-t``` Specify what semester/term you want to use for a given command
