@@ -6,7 +6,7 @@ import argparse
 import re
 from datetime import date
 
-def single_class(subject, catalog_nbr, URL, include_lab, term='2222'):
+def single_class(subject, catalog_nbr, URL, include_lab, term='2222') -> None:
     PARAMS = {
         'institution':'CHICO',
         'term':term, # Term is a numerical representation of Spring/Summer/Fall/Winter term
@@ -44,7 +44,7 @@ def single_class(subject, catalog_nbr, URL, include_lab, term='2222'):
         print(class_list.status_code)
         
 
-def multi_class(subjects, URL, best, term='2222'):
+def multi_class(subjects, URL, best, term='2222') -> None:
     subjects = set(subjects) # removes duplicates
     WEEKDAYS = {0: "Mo", 1: "Tu", 2: "We", 3: "Th", 4: "Fr"}
     times = {
@@ -111,7 +111,7 @@ def get_term(mod) -> str:
     return str(term)
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent('''\
         Query current CSU Chico course schedule
 
@@ -147,7 +147,7 @@ def main():
         term = get_term(mod_term)
     except:
         print("Failed to read term argument, please try again.")
-        return
+        return 1
     # Figure out which command they're using
     if args.command == "S":
         try:
@@ -155,19 +155,20 @@ def main():
             single_class(subject, catalog_nbr, URL, args.lab, term)
         except ValueError:
             print(f"Failed to parse {args.name[0]}, failing...")
-            return
+            return 1
     elif args.command == "M":
         if not bool(args.best) and not bool(args.worst):
             print("M command requires one of the two subcommands, -b or -w")
+            return 1
         else:
             multi_class((args.best if bool(args.best) else args.worst), URL, bool(args.best), term)
     elif args.command == "T":
         print("Time command implementation in progress")
-        return
+        return 1
     else:
         print("Something went wrong", file=sys.stderr)
-        return
-    return
+        return 1
+    return 0
 
 
 
