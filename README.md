@@ -6,12 +6,6 @@ Currently runs on Python 3.9.7
 
 ## Usage
 
-- Global Option:
-    - ```-t``` Specify what semester/term you want to use for a given command
-        - 0 by default, gets current semester's term
-        - Format: ```./main_search.py -t -1 S CSCI-111```
-            - Will result in previous semester's results
-
 - Single Class Search:
     - ```./main_search.py S CSCI-211```
     - By default excludes lab sections, use -l to enable labs
@@ -23,5 +17,11 @@ Currently runs on Python 3.9.7
 
 - Time Function
     - Not created yet
+
+- Global Option:
+    - ```-t``` Specify what semester/term you want to use for a given command
+        - 0 by default, gets current semester's term
+        - Format: ```./main_search.py -t -1 S CSCI-111```
+            - Will result in previous semester's results
 
 Planned features are in ```TODO.md```
