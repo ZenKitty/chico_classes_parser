@@ -96,6 +96,45 @@ def multi_class(subjects, URL, best, term='2222') -> None:
 
     return
 
+
+def time_to_times(hour: str, minute: str):
+    hour_int = int(hour)
+    if hour_int < 8:
+        hour_int += 12
+    if int(minute) == 30:
+        hour_int += .5
+    return (str(hour_int), str(hour_int+3))
+
+
+def class_time(subject, URL, term, given_time):
+    hour, minute = given_time.split(":")
+    time_tuple = time_to_times(hour, minute)
+    time_string = f"{time_tuple[0]},{time_tuple[1]}"
+    PARAMS = {
+        'institution':'CHICO',
+        'term':term, # Term is a numerical representation of Spring/Summer/Fall/Winter term
+        'subject':subject, # 4 letter abbreviation, i.e. KINE = Kinesiology
+        'time_range': time_string,
+    }
+    class_list = requests.get(url=URL, params=PARAMS)
+    if class_list.status_code == 200:
+        class_dict = class_list.json()
+        if not bool(class_dict):
+            print(f"No classes found at {given_time}")
+            return
+        print(f"Classes starting at {given_time}")
+        for class_found in class_dict:
+            for time in class_found['meetings']:
+                start_hour = time['start_time'].split('.')[0].lstrip('0')
+                start_minute = time['start_time'].split('.')[1]
+                if start_hour == hour and start_minute == minute:
+                    print(f"{class_found['subject']}-{class_found['catalog_nbr']}\t{class_found['component']} Section {class_found['class_section']}")
+        return
+    else:
+        print(f"Search failed with a code of: {class_list.status_code}")
+        return
+
+
 # Gets the numerical value for the given term requested, relative to current semester
 def get_term(mod) -> str:
     today_term = date.today()
@@ -110,6 +149,7 @@ def get_term(mod) -> str:
     coeff = 1 if mod > 0 else -1
     term = ((today_term.year + add_year) % 2022)*10*coeff + 2222 + add_sem
     return str(term)
+
 
 
 def main() -> int:
@@ -134,7 +174,7 @@ def main() -> int:
     group2.add_argument("-w", "--worst", help="Find the best time for an event, given a list of Subject Abbreviations", nargs="+", metavar="SUBJECT")
 
     time_parse = subparsers.add_parser("T")
-    time_parse.add_argument("time", help="Find how many classes start at a specific time. Format: 10:00 AM, or 2:00 PM", nargs=1, type=str, metavar="TIME")
+    time_parse.add_argument("time", help="Find how many classes start at a specific time. Format: 10:00, or 2:30", nargs=2, type=str, metavar=("SUBJECT", "TIME"))
     
     parser.add_argument("-t", "--term", help="Specify a term relative to current term. Each semester is worth 1. Only fall and spring available currently. Format: '1', '+2', or '-4', etc. ", nargs=1, type=str, default='0')
     args = parser.parse_args()
@@ -164,8 +204,8 @@ def main() -> int:
         else:
             multi_class((args.best if bool(args.best) else args.worst), URL, bool(args.best), term)
     elif args.command == "T":
-        print("Time command implementation in progress")
-        return 1
+        class_time(args.time[0], URL, term, args.time[1])
+        # return 1
     else:
         print("Something went wrong", file=sys.stderr)
         return 1
