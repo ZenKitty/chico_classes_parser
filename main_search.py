@@ -6,6 +6,15 @@ import argparse
 import re
 from datetime import date
 
+
+    #    
+    #   This is a command line program designed to be used for CSU Chico's class search functionality 
+    #   
+    #    
+    #   Developed by Duncan Hendrickson, GitHub repo available at: https://github.com/ZenKitty/chico_classes_parser 
+    #    
+
+
 def single_class(subject, catalog_nbr, URL, include_lab, term='2222') -> None:
     PARAMS = {
         'institution':'CHICO',
