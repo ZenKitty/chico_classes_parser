@@ -15,7 +15,7 @@ from datetime import date
     #    
 
 
-def single_class(subject, catalog_nbr, URL, include_lab, term='2222') -> None:
+def single_class(subject, catalog_nbr, URL, include_lab, term, verbose) -> None:
     PARAMS = {
         'institution':'CHICO',
         'term':term, # Term is a numerical representation of Spring/Summer/Fall/Winter term
@@ -33,7 +33,12 @@ def single_class(subject, catalog_nbr, URL, include_lab, term='2222') -> None:
             print("No classes found with that Subject and Catalog Number")
         for class_found in class_dict:
             if class_found['component'] == "DIS" or class_found['component'] == "LEC" or (class_found['component'] == "ACT" and include_lab):
-                print(f"{class_found['component']} Section {class_found['class_section']}:")
+                print(f"{class_found['component']} Section {class_found['class_section']}:", end="")
+                if verbose: 
+                    prof = class_found['instructors'][0]['name']
+                    print(f"\t{prof}") 
+                else: 
+                    print("")
                 for time in class_found['meetings']:
                     start_hour, start_minute, start_second, excess = time['start_time'].split('.')
                     start_hour_int = int(start_hour) if int(start_hour) <= 12 else int(start_hour) % 12
@@ -46,7 +51,11 @@ def single_class(subject, catalog_nbr, URL, include_lab, term='2222') -> None:
                     end_hour, end_minute, end_second, excess = time['end_time'].split('.')
                     end_string = f"\t{end_hour_int}:{end_minute} {end_M}"
                     
-                    print(f"\t{time['days']}")
+                    print(f"\t{time['days']}", end="")
+                    if verbose:
+                        print(f"\t{class_found['instruction_mode_descr']}")
+                    else:
+                        print("")
                     print(start_string)
                     print(end_string)
         return
@@ -176,6 +185,7 @@ def main() -> int:
     solo_parser = subparsers.add_parser("S")
     solo_parser.add_argument("name", nargs=1, type=str, help="Input class name and number. Format: CSCI-211")
     solo_parser.add_argument("-l", "--lab", help="Include lab sections", action="store_true")
+    solo_parser.add_argument("-v", "--verbose", help="Include information like Instructor and Instruction Mode (online or in-person, etc.)", action="store_true")
     
     multi_parser = subparsers.add_parser("M")
     group2 = multi_parser.add_mutually_exclusive_group()
@@ -205,7 +215,7 @@ def main() -> int:
     if args.command == "S":
         try:
             subject, catalog_nbr = args.name[0].split('-')
-            single_class(subject, catalog_nbr, URL, args.lab, term)
+            single_class(subject, catalog_nbr, URL, args.lab, term, args.verbose)
         except ValueError:
             print(f"Failed to parse {args.name[0]}, failing...")
             return 1
