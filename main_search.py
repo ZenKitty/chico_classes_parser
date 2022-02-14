@@ -177,7 +177,10 @@ def main() -> int:
     time_parse.add_argument("time", help="Find how many classes start at a specific time. Format: 10:00, or 2:30", nargs=2, type=str, metavar=("SUBJECT", "TIME"))
     
     parser.add_argument("-t", "--term", help="Specify a term relative to current term. Each semester is worth 1. Only fall and spring available currently. Format: '1', '+2', or '-4', etc. ", nargs=1, type=str, default='0')
-    args = parser.parse_args()
+    try:
+        args = parser.parse_args()
+    except:
+        print("Unknown argument parser error. If you believe this to be an error please contact")
 
     # CSU Chico class schedule search
     URL = "https://cmsweb.csuchico.edu/psc/CCHIPRD/EMPLOYEE/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?"
