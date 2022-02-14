@@ -137,7 +137,7 @@ def class_time(subject, URL, term, given_time):
                 start_hour = time['start_time'].split('.')[0].lstrip('0')
                 start_minute = time['start_time'].split('.')[1]
                 if start_hour == hour and start_minute == minute:
-                    print(f"{class_found['subject']}-{class_found['catalog_nbr']}\t{class_found['component']} Section {class_found['class_section']}")
+                    print(f"{class_found['subject']}-{class_found['catalog_nbr']}\t{class_found['component']} Section {class_found['class_section']}\t{time['days']}")
         return
     else:
         print(f"Search failed with a code of: {class_list.status_code}")
