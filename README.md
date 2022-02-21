@@ -8,7 +8,8 @@ Currently runs on Python 3.9.7
 
 - Single Class Search:
     - ```./main_search.py S CSCI-211```
-    - By default excludes lab sections, use -l to enable labs
+    - By default excludes lab sections, use `-l` to enable labs
+    - Use `-r` to display raw json data
 
 - Multi-Class Functions
     - ```./main_search.py M -b CSCI CINS ...```
