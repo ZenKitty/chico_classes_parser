@@ -4,6 +4,7 @@ import textwrap
 import requests
 import argparse
 import re
+import json
 from datetime import date
 
 
@@ -15,7 +16,7 @@ from datetime import date
     #    
 
 
-def single_class(subject, catalog_nbr, URL, include_lab, term, verbose) -> None:
+def single_class(subject, catalog_nbr, URL, include_lab, term, verbose, raw) -> None:
     PARAMS = {
         'institution':'CHICO',
         'term':term, # Term is a numerical representation of Spring/Summer/Fall/Winter term
@@ -27,7 +28,9 @@ def single_class(subject, catalog_nbr, URL, include_lab, term, verbose) -> None:
     
     if class_list.status_code == 200:
         class_dict = class_list.json()
-        print(class_list)
+        if raw:
+            print(json.dumps(class_dict, indent=4))
+            return
         print(f"Search Results for {subject}-{catalog_nbr}")
         if not bool(class_dict):
             print("No classes found with that Subject and Catalog Number")
@@ -63,7 +66,7 @@ def single_class(subject, catalog_nbr, URL, include_lab, term, verbose) -> None:
         return
         
 
-def multi_class(subjects, URL, best, term='2222') -> None:
+def multi_class(subjects, URL, best, term, raw) -> None:
     subjects = set(subjects) # removes duplicates
     WEEKDAYS = {0: "Mo", 1: "Tu", 2: "We", 3: "Th", 4: "Fr"}
     times = {
@@ -185,6 +188,7 @@ def main() -> int:
     solo_parser.add_argument("name", nargs=1, type=str, help="Input class name and number. Format: CSCI-211")
     solo_parser.add_argument("-l", "--lab", help="Include lab sections", action="store_true")
     solo_parser.add_argument("-v", "--verbose", help="Include information like Instructor and Instruction Mode (online or in-person, etc.)", action="store_true")
+    solo_parser.add_argument("-r", "--raw", help="Print raw JSON data instead of parsed output.", action="store_true")
     
     multi_parser = subparsers.add_parser("M")
     group2 = multi_parser.add_mutually_exclusive_group()
@@ -214,7 +218,7 @@ def main() -> int:
     if args.command == "S":
         try:
             subject, catalog_nbr = args.name[0].split('-')
-            single_class(subject, catalog_nbr, URL, args.lab, term, args.verbose)
+            single_class(subject, catalog_nbr, URL, args.lab, term, args.verbose, bool(args.raw))
         except ValueError:
             print(f"Failed to parse {args.name[0]}, failing...")
             return 1
