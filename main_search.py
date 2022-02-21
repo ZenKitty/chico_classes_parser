@@ -43,12 +43,12 @@ def single_class(subject, catalog_nbr, URL, include_lab, term, verbose, raw) -> 
                 else: 
                     print("")
                 for time in class_found['meetings']:
-                    start_hour, start_minute, start_second, excess = time['start_time'].split('.')
+                    start_hour, start_minute, excess = time['start_time'].split('.', 2)
                     start_hour_int = int(start_hour) if int(start_hour) <= 12 else int(start_hour) % 12
                     start_M = "PM" if int(start_hour) >= 12 else "AM"
                     start_string = f"\t{start_hour_int}:{start_minute} {start_M}"
 
-                    end_hour, end_minute, end_second, excess = time['end_time'].split('.')
+                    end_hour, end_minute, excess = time['end_time'].split('.', 2)
                     end_hour_int = int(end_hour) if int(end_hour) <= 12 else int(end_hour) % 12
                     end_M = "PM" if int(end_hour) >= 12 else "AM"
                     end_string = f"\t{end_hour_int}:{end_minute} {end_M}"
