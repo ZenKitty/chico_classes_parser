@@ -48,7 +48,6 @@ def single_class(subject, catalog_nbr, URL, include_lab, term, verbose) -> None:
                     end_hour, end_minute, end_second, excess = time['end_time'].split('.')
                     end_hour_int = int(end_hour) if int(end_hour) <= 12 else int(end_hour) % 12
                     end_M = "PM" if int(end_hour) >= 12 else "AM"
-                    end_hour, end_minute, end_second, excess = time['end_time'].split('.')
                     end_string = f"\t{end_hour_int}:{end_minute} {end_M}"
                     
                     print(f"\t{time['days']}", end="")
