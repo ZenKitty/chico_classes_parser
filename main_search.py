@@ -218,7 +218,8 @@ def main() -> int:
     # Figure out which command they're using
     if args.command == "S":
         try:
-            subject, catalog_nbr = args.name[0].split('-')
+            subject, catalog_nbr = re.split("-|_", args.name[0], 1)
+            subject = subject.upper()
             single_class(subject, catalog_nbr, URL, args.lab, term, args.verbose, bool(args.raw))
         except ValueError:
             print(f"Failed to parse {args.name[0]}, failing...")
