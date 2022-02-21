@@ -232,7 +232,6 @@ def main() -> int:
             multi_class((args.best if bool(args.best) else args.worst), URL, bool(args.best), term)
     elif args.command == "T":
         class_time(args.time[0], URL, term, args.time[1])
-        # return 1
     else:
         print("Something went wrong", file=sys.stderr)
         return 1
