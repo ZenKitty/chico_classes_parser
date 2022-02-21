@@ -66,7 +66,7 @@ def single_class(subject, catalog_nbr, URL, include_lab, term, verbose, raw) -> 
         return
         
 
-def multi_class(subjects, URL, best, term, raw) -> None:
+def multi_class(subjects, URL, best, term) -> None:
     subjects = set(subjects) # removes duplicates
     WEEKDAYS = {0: "Mo", 1: "Tu", 2: "We", 3: "Th", 4: "Fr"}
     times = {
@@ -116,7 +116,8 @@ def multi_class(subjects, URL, best, term, raw) -> None:
 
     return
 
-
+# Have to input a range that fully encapsulates the class time, just shooting for a 3 hour window
+    # for labs and such
 def time_to_times(hour: str, minute: str):
     hour_int = int(hour)
     if hour_int < 8:
