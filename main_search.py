@@ -203,7 +203,7 @@ def main() -> int:
     try:
         args = parser.parse_args()
     except:
-        print("Unknown argument parser error. If you believe this to be an error please contact")
+        print("Unknown argument parser error. If you believe this to be an error please contact", file=sys.stderr)
 
     # CSU Chico class schedule search
     URL = "https://cmsweb.csuchico.edu/psc/CCHIPRD/EMPLOYEE/SA/s/WEBLIB_HCX_CM.H_CLASS_SEARCH.FieldFormula.IScript_ClassSearch?"
@@ -213,7 +213,7 @@ def main() -> int:
         mod_term = int(args.term[0])
         term = get_term(mod_term)
     except:
-        print("Failed to read term argument, please try again.")
+        print("Failed to read term argument, please try again.", file=sys.stderr)
         return 1
     # Figure out which command they're using
     if args.command == "S":
@@ -222,11 +222,11 @@ def main() -> int:
             subject = subject.upper()
             single_class(subject, catalog_nbr, URL, args.lab, term, args.verbose, bool(args.raw))
         except ValueError:
-            print(f"Failed to parse {args.name[0]}, failing...")
+            print(f"Failed to parse {args.name[0]}, failing...", file=sys.stderr)
             return 1
     elif args.command == "M":
         if not bool(args.best) and not bool(args.worst):
-            print("M command requires one of the two subcommands, -b or -w")
+            print("M command requires one of the two subcommands, -b or -w", file=sys.stderr)
             return 1
         else:
             multi_class((args.best if bool(args.best) else args.worst), URL, bool(args.best), term)
