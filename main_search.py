@@ -183,7 +183,7 @@ def main() -> int:
     
 
     # Allow user to use Single class functions or multiclass functions
-    subparsers = parser.add_subparsers(title="Valid Subcommands", help="Type of query, S = Single, M = Multi, T not yet implemented", dest="command", required=True)
+    subparsers = parser.add_subparsers(title="Valid Subcommands", help="Type of query, S = Single, M = Multi, T = Time", dest="command", required=True)
     
     solo_parser = subparsers.add_parser("S")
     solo_parser.add_argument("name", nargs=1, type=str, help="Input class name and number. Format: CSCI-211")
