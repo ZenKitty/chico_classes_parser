@@ -35,7 +35,7 @@ def single_class(subject, catalog_nbr, URL, include_lab, term, verbose, raw) -> 
         if not bool(class_dict):
             print("No classes found with that Subject and Catalog Number")
         for class_found in class_dict:
-            if class_found['component'] == "DIS" or class_found['component'] == "LEC" or (class_found['component'] == "ACT" and include_lab):
+            if class_found['component'] == "DIS" or class_found['component'] == "LEC" or ((class_found['component'] == "ACT" or class_found['component'] == "LAB") and include_lab):
                 print(f"{class_found['component']} Section {class_found['class_section']}:", end="")
                 if verbose: 
                     prof = class_found['instructors'][0]['name']
