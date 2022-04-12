@@ -155,6 +155,36 @@ def class_time(subject, URL, term, given_time):
         print(f"Search failed with a code of: {class_list.status_code}")
         return
 
+def list_classes(subject, URL, term):
+    class_nums = []
+    class_list = {"classes":[]}
+    for i in range(1, 100):
+        PARAMS = {
+            'institution':'CHICO',
+            'term':term, # Term is a numerical representation of Spring/Summer/Fall/Winter term
+            'subject':subject, # 4 letter abbreviation, i.e. KINE = Kinesiology
+            'page':i,
+        }
+        class_response = requests.get(url=URL, params=PARAMS)
+        if bool(class_response.json()):
+            class_list['classes'].extend(class_response.json())
+            print(f"printing {i}")
+        else:
+            break
+
+    if bool(class_list):
+        class_dict = class_list["classes"] #.json()
+        if not bool(class_dict):
+            print(f"No classes found in {subject}")
+            return
+        print(f"Classes from {subject}...")
+        for class_found in class_dict:
+            if class_found['catalog_nbr'] not in class_nums:
+                class_nums.append(class_found['catalog_nbr'])
+                print(f"{class_found['subject']}-{class_found['catalog_nbr']}")
+        
+
+
 
 # Gets the numerical value for the given term requested, relative to current semester
 def get_term(mod) -> str:
@@ -198,6 +228,9 @@ def main() -> int:
 
     time_parse = subparsers.add_parser("T")
     time_parse.add_argument("time", help="Find how many classes start at a specific time. Format: 10:00, or 2:30", nargs=2, type=str, metavar=("SUBJECT", "TIME"))
+
+    list_all = subparsers.add_parser("L")
+    list_all.add_argument("list", help="List all classes from a given subject. Format: 'CSCI' or 'NURS', etc.", nargs=1, type=str)
     
     parser.add_argument("-t", "--term", help="Specify a term relative to current term. Each semester is worth 1. Only fall and spring available currently. Format: '1', '+2', or '-4', etc. ", nargs=1, type=str, default='0')
     try:
@@ -232,6 +265,8 @@ def main() -> int:
             multi_class((args.best if bool(args.best) else args.worst), URL, bool(args.best), term)
     elif args.command == "T":
         class_time(args.time[0], URL, term, args.time[1])
+    elif args.command == "L":
+        list_classes(args.list[0].upper(), URL, term)
     else:
         print("Something went wrong", file=sys.stderr)
         return 1
