@@ -168,7 +168,6 @@ def list_classes(subject, URL, term):
         class_response = requests.get(url=URL, params=PARAMS)
         if bool(class_response.json()):
             class_list['classes'].extend(class_response.json())
-            print(f"printing {i}")
         else:
             break
 
@@ -184,6 +183,34 @@ def list_classes(subject, URL, term):
                 print(f"{class_found['subject']}-{class_found['catalog_nbr']}")
         
 
+
+def by_units(subject, URL, term, units_wanted):
+    class_nums = []
+    class_list = {"classes":[]}
+    for i in range(1, 100):
+        PARAMS = {
+            'institution':'CHICO',
+            'term':term, # Term is a numerical representation of Spring/Summer/Fall/Winter term
+            'subject':subject, # 4 letter abbreviation, i.e. KINE = Kinesiology
+            'page':i,
+            'units':units_wanted,
+        }
+        class_response = requests.get(url=URL, params=PARAMS)
+        if bool(class_response.json()):
+            class_list['classes'].extend(class_response.json())
+        else:
+            break
+
+    if bool(class_list):
+        class_dict = class_list["classes"] #.json()
+        if not bool(class_dict):
+            print(f"No classes found with {units_wanted} units")
+            return
+        print(f"Classes with {units_wanted} units...")
+        for class_found in class_dict:
+            if class_found['catalog_nbr'] not in class_nums:
+                class_nums.append(class_found['catalog_nbr'])
+                print(f"{class_found['subject']}-{class_found['catalog_nbr']}")
 
 
 # Gets the numerical value for the given term requested, relative to current semester
@@ -231,6 +258,9 @@ def main() -> int:
 
     list_all = subparsers.add_parser("L")
     list_all.add_argument("list", help="List all classes from a given subject. Format: 'CSCI' or 'NURS', etc.", nargs=1, type=str)
+
+    unit_list = subparsers.add_parser("U")
+    unit_list.add_argument("units", help="List all classes from a subject with a given unit number", nargs=2, type=str)
     
     parser.add_argument("-t", "--term", help="Specify a term relative to current term. Each semester is worth 1. Only fall and spring available currently. Format: '1', '+2', or '-4', etc. ", nargs=1, type=str, default='0')
     try:
@@ -267,6 +297,8 @@ def main() -> int:
         class_time(args.time[0], URL, term, args.time[1])
     elif args.command == "L":
         list_classes(args.list[0].upper(), URL, term)
+    elif args.command == "U":
+        by_units(args.units[0].upper(), URL, term, int(args.units[1]))
     else:
         print("Something went wrong", file=sys.stderr)
         return 1
