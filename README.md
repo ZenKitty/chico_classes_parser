@@ -21,6 +21,14 @@ Currently runs on Python 3.9.7
     - Shows class sections that start at given time
     - Accepts whole or half hours in format H:MM
 
+- List Function
+    - ```./main_search.py L CSCI```
+    - Lists all classes from a subject
+
+- Unit Function
+    - ```./main_search.py U CSCI 4```
+    - Lists all classes from a given subject by unit number
+
 - Global Option:
     - ```-t``` Specify what semester/term you want to use for a given command
         - 0 by default, gets current semester's term
