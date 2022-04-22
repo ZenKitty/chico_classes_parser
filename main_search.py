@@ -35,7 +35,7 @@ def single_class(subject, catalog_nbr, URL, include_lab, term, verbose, raw) -> 
         if not bool(class_dict):
             print("No classes found with that Subject and Catalog Number")
         for class_found in class_dict:
-            if class_found['component'] == "DIS" or class_found['component'] == "LEC" or ((class_found['component'] == "ACT" or class_found['component'] == "LAB") and include_lab):
+            if class_found['component'] == "DIS" or class_found['component'] == "LEC" or class_found['component'] == "SUP" or ((class_found['component'] == "ACT" or class_found['component'] == "LAB") and include_lab):
                 print(f"{class_found['component']} Section {class_found['class_section']}:", end="")
                 if verbose: 
                     prof = class_found['instructors'][0]['name']
@@ -43,15 +43,16 @@ def single_class(subject, catalog_nbr, URL, include_lab, term, verbose, raw) -> 
                 else: 
                     print("")
                 for time in class_found['meetings']:
-                    start_hour, start_minute, excess = time['start_time'].split('.', 2)
-                    start_hour_int = int(start_hour) if int(start_hour) <= 12 else int(start_hour) % 12
-                    start_M = "PM" if int(start_hour) >= 12 else "AM"
-                    start_string = f"\t{start_hour_int}:{start_minute} {start_M}"
+                    if time['days'] != "TBA":
+                        start_hour, start_minute, excess = time['start_time'].split('.', 2)
+                        start_hour_int = int(start_hour) if int(start_hour) <= 12 else int(start_hour) % 12
+                        start_M = "PM" if int(start_hour) >= 12 else "AM"
+                        start_string = f"\t{start_hour_int}:{start_minute} {start_M}"
 
-                    end_hour, end_minute, excess = time['end_time'].split('.', 2)
-                    end_hour_int = int(end_hour) if int(end_hour) <= 12 else int(end_hour) % 12
-                    end_M = "PM" if int(end_hour) >= 12 else "AM"
-                    end_string = f"\t{end_hour_int}:{end_minute} {end_M}"
+                        end_hour, end_minute, excess = time['end_time'].split('.', 2)
+                        end_hour_int = int(end_hour) if int(end_hour) <= 12 else int(end_hour) % 12
+                        end_M = "PM" if int(end_hour) >= 12 else "AM"
+                        end_string = f"\t{end_hour_int}:{end_minute} {end_M}"
                     
                     print(f"\t{time['days']}", end="")
                     if verbose:
